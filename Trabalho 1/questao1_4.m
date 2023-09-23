@@ -287,6 +287,149 @@ end
 
 
 
+% 6) Cálculo da STFT dos sinais "sim" e "não" divididos em 10 blocos
+numBlocosSTFT = 10;  % Número de blocos desejados para a STFT
+
+% Calcule o tamanho de cada bloco da STFT (N/10 amostras)
+tamanhoBlocoSTFT = floor(length(S1) / numBlocosSTFT);
+
+% Frequências correspondentes aos pontos da STFT (de 0 a pi/2)
+frequenciasSTFT = (0:pi/2/tamanhoBlocoSTFT:pi/2-pi/2/tamanhoBlocoSTFT);
+
+% Inicialize matrizes para armazenar as STFTs dos sinais "sim" e "não"
+STFTsSim = zeros(length(frequenciasSTFT), numBlocosSTFT, 5);
+STFTsNao = zeros(length(frequenciasSTFT), numBlocosSTFT, 5);
+
+% Divida e calcule as STFTs para um sinal "sim" (por exemplo, o primeiro)
+sinalSim = S1;
+for j = 1:numBlocosSTFT
+    inicio = (j - 1) * tamanhoBlocoSTFT + 1;
+    fim = j * tamanhoBlocoSTFT;
+    bloco = sinalSim(inicio:fim);
+    STFT = abs(fftshift(fft(bloco))).^2;
+    STFTsSim(:, j, 1) = STFT(1:length(frequenciasSTFT));
+end
+
+% Divida e calcule as STFTs para um sinal "não" (por exemplo, o primeiro)
+sinalNao = N1;
+for j = 1:numBlocosSTFT
+    inicio = (j - 1) * tamanhoBlocoSTFT + 1;
+    fim = j * tamanhoBlocoSTFT;
+    bloco = sinalNao(inicio:fim);
+    STFT = abs(fftshift(fft(bloco))).^2;
+    STFTsNao(:, j, 1) = STFT(1:length(frequenciasSTFT));
+end
+
+
+% Plote as STFTs dos sinais "sim" em uma figura
+figure;
+
+for i = 1:numBlocosSTFT
+    subplot(5, 5, i);
+    plot(frequenciasSTFT, STFTsSim(:, i, 1));
+    title(['STFT Sim Bloco ', num2str(i)]);
+    xlabel('Frequência (rad)');
+    ylabel('Módulo ao Quadrado');
+    xlim([0, pi/2]);
+    
+    % Adicione o código para ajustar o espaçamento aqui, se necessário
+end
+
+% Plote as STFTs dos sinais "não" em outra figura
+figure;
+
+for i = 1:numBlocosSTFT
+    subplot(5, 5, i);
+    plot(frequenciasSTFT, STFTsNao(:, i, 1));
+    title(['STFT Não Bloco ', num2str(i)]);
+    xlabel('Frequência (rad)');
+    ylabel('Módulo ao Quadrado');
+    xlim([0, pi/2]);
+    
+    % Adicione o código para ajustar o espaçamento aqui, se necessário
+end
+
+
+
+
+% 7)
+% Número de blocos desejados para a STFT
+numBlocosSTFT = 8;
+
+% Calcule o tamanho de cada bloco da STFT (N/320 amostras)
+tamanhoBlocoSTFT = floor(N / 320);
+
+% Inicialize matrizes para armazenar as energias dos blocos das STFTs
+energiasBlocosSim = zeros(tamanhoBlocoSTFT, numBlocosSTFT * 5);
+energiasBlocosNao = zeros(tamanhoBlocoSTFT, numBlocosSTFT * 5);
+
+% Divida e calcule as energias para os sinais "sim" em cada STFT
+for i = 1:5
+    STFTsim = STFTsSim(:, i);
+    for j = 1:numBlocosSTFT
+        inicio = (j - 1) * tamanhoBlocoSTFT + 1;
+        fim = j * tamanhoBlocoSTFT;
+        blocoSTFT = STFTsim(inicio:fim);
+        energiasBlocosSim(:, (i - 1) * numBlocosSTFT + j) = sum(abs(blocoSTFT).^2);
+    end
+end
+
+% Divida e calcule as energias para os sinais "não" em cada STFT
+for i = 1:5
+    STFTnao = STFTsNao(:, i);
+    for j = 1:numBlocosSTFT
+        inicio = (j - 1) * tamanhoBlocoSTFT + 1;
+        fim = j * tamanhoBlocoSTFT;
+        blocoSTFT = STFTnao(inicio:fim);
+        energiasBlocosNao(:, (i - 1) * numBlocosSTFT + j) = sum(abs(blocoSTFT).^2);
+    end
+end
+
+% Agora você terá 80 energias para cada sinal de áudio (sim e não) em cada STFT.
+
+
+
+
+% 8) 
+% Organize as energias calculadas no domínio do tempo para "sim" e "não" em vetores
+energiasTempoSim = energiasSim(:); % Transforma a matriz em um vetor coluna
+energiasTempoNao = energiasNao(:);
+
+% Agora você tem dois vetores de tamanho 80x1 representando "sim" e "não" no domínio do tempo.
+
+% Organize as energias calculadas no domínio da TF para "sim" e "não" em vetores
+energiasTFSim = energiasBlocosSim(:); % Transforma a matriz em um vetor coluna
+energiasTFNao = energiasBlocosNao(:);
+
+% Agora você tem dois vetores de tamanho 80x1 representando "sim" e "não" no domínio da TF.
+
+% Organize as energias calculadas no domínio da STFT para "sim" e "não" em vetores
+energiasSTFTSim = energiasBlocosSim(:); % Transforma a matriz em um vetor coluna
+energiasSTFTNao = energiasBlocosNao(:);
+
+% Agora você tem dois vetores de tamanho 80x1 representando "sim" e "não" no domínio da STFT.
+
+
+
+
+
+% Calcule a média das energias para "sim" e "não" no domínio do tempo
+centroideTempoSim = mean(energiasTempoSim, 2); % Vetor coluna com tamanho 80x1
+centroideTempoNao = mean(energiasTempoNao, 2); % Vetor coluna com tamanho 80x1
+
+% Calcule a média das energias para "sim" e "não" no domínio da TF
+centroideTFSim = mean(energiasTFSim, 2); % Vetor coluna com tamanho 80x1
+centroideTFNao = mean(energiasTFNao, 2); % Vetor coluna com tamanho 80x1
+
+% Calcule a média das energias para "sim" e "não" no domínio da STFT
+centroideSTFTSim = mean(energiasSTFTSim, 2); % Vetor coluna com tamanho 80x1
+centroideSTFTNao = mean(energiasSTFTNao, 2); % Vetor coluna com tamanho 80x1
+
+
+
+
+
+
 
 
 

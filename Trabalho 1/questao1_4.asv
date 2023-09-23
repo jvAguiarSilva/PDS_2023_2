@@ -1,0 +1,49 @@
+% Número de blocos desejados
+numBlocosTempo = 80;
+
+% Inicialize matrizes para armazenar as energias no domínio do tempo
+energiasTempoTeste = zeros(numBlocosTempo, numTestes);
+
+% Loop através dos sinais de teste
+for teste = 1:numTestes
+    % Selecione o sinal de teste (SinalTeste1 a SinalTeste7)
+    sinalTeste = eval(['SinalTeste', num2str(teste)]);
+
+    % Calcule o tamanho de cada bloco no domínio do tempo
+    tamanhoBlocoTempo = floor(length(sinalTeste) / numBlocosTempo);
+
+    % Inicialize vetor para armazenar as energias no domínio do tempo
+    energiaTempo = zeros(numBlocosTempo, 1);
+
+    % Divida e calcule as energias no domínio do tempo
+    for j = 1:numBlocosTempo
+        inicio = (j - 1) * tamanhoBlocoTempo + 1;
+        fim = j * tamanhoBlocoTempo;
+        bloco = sinalTeste(inicio:fim);
+        energiaTempo(j) = sum(bloco.^2);
+    end
+
+    % Armazene o vetor de energia no domínio do tempo
+    energiasTempoTeste(:, teste) = energiaTempo;
+end
+
+
+
+
+% Inicialize matrizes para armazenar as energias no domínio da TF
+energiasTFTeste = zeros(numBlocosTempo, numTestes);
+
+% Loop através dos sinais de teste
+for teste = 1:numTestes
+    % Selecione o sinal de teste (SinalTeste1 a SinalTeste7)
+    sinalTeste = eval(['SinalTeste', num2str(teste)]);
+
+    % Calcule o módulo ao quadrado da TF
+    TF = abs(fftshift(fft(sinalTeste))).^2;
+
+    % Armazene o vetor de energia no domínio da TF
+    energiasTFTeste(:, teste) = TF;
+end
+
+
+
