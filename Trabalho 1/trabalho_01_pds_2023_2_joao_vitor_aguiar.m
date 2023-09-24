@@ -51,8 +51,6 @@ for i = 1:5
     plot(sinaisDeAudioSim(:, i));
     title(labelsSim{i});
 end
-
-% Ajustar o espaçamento 
 spacing = 0.02;
 margin = 0.05;
 padding = 0.02;
@@ -65,7 +63,7 @@ for i = 1:length(subplotsSim)
 end
 
 
-% Criar uma figura para os sinais "Não"
+% Criando uma figura para os sinais "Não"
 figure;
 
 sinaisDeAudioNao = [N1, N2, N3, N4, N5];
@@ -79,7 +77,6 @@ for i = 1:5
     
 end
 
-% Ajustar o espaçamento
 spacing = 0.02;
 margin = 0.05;
 padding = 0.02;
@@ -93,20 +90,13 @@ end
 
 
 
-
 % 2) Energia dos sinais
-
-% Número de blocos desejados
 numBlocos = 80;
-
-% Calcule o tamanho de cada bloco
 tamanhoBloco = floor(length(S1) / numBlocos);
-
-% Inicialize matrizes para armazenar as energias dos blocos
 energiasSim = zeros(tamanhoBloco, numBlocos);
 energiasNao = zeros(tamanhoBloco, numBlocos);
 
-% Divida e calcule as energias para os sinais "sim"
+% Energias para os sinais "sim"
 for i = 1:5
     sinalSim = eval(['S', num2str(i)]);
     for j = 1:numBlocos
@@ -117,7 +107,7 @@ for i = 1:5
     end
 end
 
-% Divida e calcule as energias para os sinais "não"
+% Energias para os sinais "não"
 for i = 1:5
     sinalNao = eval(['N', num2str(i)]);
     for j = 1:numBlocos
@@ -128,10 +118,10 @@ for i = 1:5
     end
 end
 
-% Crie figuras para as energias dos sinais "sim" e "não"
+% Figuras para as energias dos sinais "sim" e "não"
 figure;
 
-% Plote as energias dos sinais "sim"
+% Plote das energias dos sinais "sim"
 for i = 1:5
     subplot(2, 3, i);
     plot(1:numBlocos, energiasSim(i, :));
@@ -142,7 +132,7 @@ end
 
 figure;
 
-% Plote as energias dos sinais "não"
+% Plote das energias dos sinais "não"
 for i = 1:5
     subplot(2, 3, i);
     plot(1:numBlocos, energiasNao(i, :));
@@ -156,11 +146,10 @@ end
 % 3) Modulo ao quadrado da Transformada de Fourier
 % Número de pontos da TF
 N = length(S1);
-
 % Frequências correspondentes aos pontos da TF
 frequencias = (-pi:2*pi/N:pi-2*pi/N);
 
-% Calcule o módulo ao quadrado da TF para os sinais "sim"
+% Módulo ao quadrado da TF para os sinais "sim"
 TFsSim = zeros(N, 5);
 for i = 1:5
     sinalSim = eval(['S', num2str(i)]);
@@ -168,7 +157,7 @@ for i = 1:5
     TFsSim(:, i) = TF;
 end
 
-% Calcule o módulo ao quadrado da TF para os sinais "não"
+% Módulo ao quadrado da TF para os sinais "não"
 TFsNao = zeros(N, 5);
 for i = 1:5
     sinalNao = eval(['N', num2str(i)]);
@@ -176,10 +165,10 @@ for i = 1:5
     TFsNao(:, i) = TF;
 end
 
-% Crie figuras para as TFs dos sinais "sim" e "não"
+% Figuras para as TFs dos sinais "sim" e "não"
 figure;
 
-% Plote as TFs dos sinais "sim"
+% Plote das TFs dos sinais "sim"
 for i = 1:5
     subplot(2, 3, i);
     plot(frequencias, TFsSim(:, i));
@@ -191,7 +180,7 @@ end
 
 figure;
 
-% Plote as TFs dos sinais "não"
+% Plote das TFs dos sinais "não"
 for i = 1:5
     subplot(2, 3, i);
     plot(frequencias, TFsNao(:, i));
@@ -203,103 +192,38 @@ end
 
 
 
-% 4) Calcule o módulo ao quadrado da TF das séries temporais "sim" e "não"
+% 4) Módulo ao quadrado da TF
 N = length(S1);  % Número de pontos da TF
 
 % Frequências correspondentes aos pontos da TF (de 0 a pi/2)
 frequencias = (0:pi/2/N:pi/2-pi/2/N);
 
-% Inicialize matrizes para armazenar as TFs dos sinais "sim" e "não"
+% Inicialização das matrizes para armazenar as TFs dos sinais "sim" e "não"
 TFsSim = zeros(length(frequencias), 5);
 TFsNao = zeros(length(frequencias), 5);
 
-% Calcule as TFs para os sinais "sim"
+% TFs para os sinais "sim"
 for i = 1:5
     sinalSim = eval(['S', num2str(i)]);
     TF = abs(fft(sinalSim)).^2;
     TFsSim(:, i) = TF(1:length(frequencias));
 end
 
-% Calcule as TFs para os sinais "não"
+% TFs para os sinais "não"
 for i = 1:5
     sinalNao = eval(['N', num2str(i)]);
     TF = abs(fft(sinalNao)).^2;
     TFsNao(:, i) = TF(1:length(frequencias));
 end
 
-% 5) Divida as TFs em blocos e calcule as energias
-numBlocos = 80;  % Número de blocos desejados
-
-% Calcule o tamanho de cada bloco (arredondando para baixo)
-tamanhoBloco = floor(length(frequencias) / numBlocos);
-
-% Inicialize matrizes para armazenar as energias dos blocos
-energiasSim = zeros(numBlocos, 5);
-energiasNao = zeros(numBlocos, 5);
-
-% Divida e calcule as energias para os sinais "sim"
-for i = 1:5
-    TFsim = TFsSim(:, i);
-    for j = 1:numBlocos
-        inicio = (j - 1) * tamanhoBloco + 1;
-        fim = j * tamanhoBloco;
-        bloco = TFsim(inicio:fim);
-        energiasSim(j, i) = sum(bloco);
-    end
-end
-
-% Divida e calcule as energias para os sinais "não"
-for i = 1:5
-    TFnao = TFsNao(:, i);
-    for j = 1:numBlocos
-        inicio = (j - 1) * tamanhoBloco + 1;
-        fim = j * tamanhoBloco;
-        bloco = TFnao(inicio:fim);
-        energiasNao(j, i) = sum(bloco);
-    end
-end
-
-% 6) Calcule a STFT de um sinal "sim" e um sinal "não"
-numBlocosSTFT = 10;  % Número de blocos desejados para a STFT
-
-% Calcule o tamanho de cada bloco da STFT (arredondando para baixo)
-tamanhoBlocoSTFT = floor(length(S1) / numBlocosSTFT);
-
-% Frequências correspondentes aos pontos da STFT (de 0 a pi/2)
-frequenciasSTFT = (0:pi/2/tamanhoBlocoSTFT:pi/2-pi/2/tamanhoBlocoSTFT);
-
-% Inicialize matrizes para armazenar as STFTs dos sinais "sim" e "não"
-STFTsSim = zeros(length(frequenciasSTFT), numBlocosSTFT);
-STFTsNao = zeros(length(frequenciasSTFT), numBlocosSTFT);
-
-% Calcule a STFT para um sinal "sim" (por exemplo, o primeiro)
-sinalSim = S1;
-for j = 1:numBlocosSTFT
-    inicio = (j - 1) * tamanhoBlocoSTFT + 1;
-    fim = j * tamanhoBlocoSTFT;
-    bloco = sinalSim(inicio:fim);
-    STFT = abs(fftshift(fft(bloco))).^2;
-    STFTsSim(:, j) = STFT(1:length(frequenciasSTFT));
-end
-
-% Calcule a STFT para um sinal "não" (por exemplo, o primeiro)
-sinalNao = N1;
-for j = 1:numBlocosSTFT
-    inicio = (j - 1) * tamanhoBlocoSTFT + 1;
-    fim = j * tamanhoBlocoSTFT;
-    bloco = sinalNao(inicio:fim);
-    STFT = abs(fftshift(fft(bloco))).^2;
-    STFTsNao(:, j) = STFT(1:length(frequenciasSTFT));
-end
-
-% Crie figuras para as STFTs dos sinais "sim" e "não"
+% Figuras para as TFs dos sinais "sim" e "não"
 figure;
 
-% Plote as STFTs dos sinais "sim"
-for i = 1:numBlocosSTFT
-    subplot(2, 5, i);
-    plot(frequenciasSTFT, STFTsSim(:, i));
-    title(['STFT Sim Bloco ', num2str(i)]);
+% Plote das TFs dos sinais "sim"
+for i = 1:5
+    subplot(2, 3, i);
+    plot(frequencias, TFsSim(:, i));
+    title(['TF Sim ', num2str(i)]);
     xlabel('Frequência (rad)');
     ylabel('Módulo ao Quadrado');
     xlim([0, pi/2]);
@@ -307,10 +231,103 @@ end
 
 figure;
 
-% Plote as STFTs dos sinais "não"
+% Plote das TFs dos sinais "não"
+for i = 1:5
+    subplot(2, 3, i);
+    plot(frequencias, TFsNao(:, i));
+    title(['TF Não ', num2str(i)]);
+    xlabel('Frequência (rad)');
+    ylabel('Módulo ao Quadrado');
+    xlim([0, pi/2]);
+end
+
+% 5) 10 TFs em 80 blocos de N/320 amostras
+numBlocos = 80;  % Número de blocos desejados
+
+% Tamanho de cada bloco (arredondando para baixo)
+tamanhoBloco = floor(length(frequencias) / numBlocos);
+
+% Inicialização das matrizes para armazenar as energias dos blocos
+energiasSim = zeros(tamanhoBloco, numBlocos, 5);
+energiasNao = zeros(tamanhoBloco, numBlocos, 5);
+
+% Energias para as TFs "sim"
+for i = 1:5
+    TFsim = TFsSim(:, i);
+    for j = 1:numBlocos
+        inicio = (j - 1) * tamanhoBloco + 1;
+        fim = j * tamanhoBloco;
+        bloco = TFsim(inicio:fim);
+        energiasSim(:, j, i) = sum(bloco.^2);
+    end
+end
+
+%Energias para as TFs "não"
+for i = 1:5
+    TFnao = TFsNao(:, i);
+    for j = 1:numBlocos
+        inicio = (j - 1) * tamanhoBloco + 1;
+        fim = j * tamanhoBloco;
+        bloco = TFnao(inicio:fim);
+        energiasNao(:, j, i) = sum(bloco.^2);
+    end
+end
+
+
+
+
+% 6) STFT dos sinais "sim" e "não" divididos em 10 blocos
+numBlocosSTFT = 10;  % Número de blocos desejados para a STFT
+
+% Tamanho de cada bloco da STFT (N/10 amostras)
+tamanhoBlocoSTFT = floor(length(S1) / numBlocosSTFT);
+
+% Frequências correspondentes aos pontos da STFT (de 0 a pi/2)
+frequenciasSTFT = (0:pi/2/tamanhoBlocoSTFT:pi/2-pi/2/tamanhoBlocoSTFT);
+
+% Inicialização das matrizes para armazenar as STFTs dos sinais "sim" e "não"
+STFTsSim = zeros(length(frequenciasSTFT), numBlocosSTFT, 5);
+STFTsNao = zeros(length(frequenciasSTFT), numBlocosSTFT, 5);
+
+% STFTs para um sinal "sim" (por exemplo, o primeiro)
+sinalSim = S1;
+for j = 1:numBlocosSTFT
+    inicio = (j - 1) * tamanhoBlocoSTFT + 1;
+    fim = j * tamanhoBlocoSTFT;
+    bloco = sinalSim(inicio:fim);
+    STFT = abs(fftshift(fft(bloco))).^2;
+    STFTsSim(:, j, 1) = STFT(1:length(frequenciasSTFT));
+end
+
+% STFTs para um sinal "não" (por exemplo, o primeiro)
+sinalNao = N1;
+for j = 1:numBlocosSTFT
+    inicio = (j - 1) * tamanhoBlocoSTFT + 1;
+    fim = j * tamanhoBlocoSTFT;
+    bloco = sinalNao(inicio:fim);
+    STFT = abs(fftshift(fft(bloco))).^2;
+    STFTsNao(:, j, 1) = STFT(1:length(frequenciasSTFT));
+end
+
+
+% Plote das STFTs dos sinais "sim" em uma figura
+figure;
+
 for i = 1:numBlocosSTFT
-    subplot(2, 5, i);
-    plot(frequenciasSTFT, STFTsNao(:, i));
+    subplot(5, 5, i);
+    plot(frequenciasSTFT, STFTsSim(:, i, 1));
+    title(['STFT Sim Bloco ', num2str(i)]);
+    xlabel('Frequência (rad)');
+    ylabel('Módulo ao Quadrado');
+    xlim([0, pi/2]);
+end
+
+% Plote das STFTs dos sinais "não" em outra figura
+figure;
+
+for i = 1:numBlocosSTFT
+    subplot(5, 5, i);
+    plot(frequenciasSTFT, STFTsNao(:, i, 1));
     title(['STFT Não Bloco ', num2str(i)]);
     xlabel('Frequência (rad)');
     ylabel('Módulo ao Quadrado');
@@ -319,131 +336,253 @@ end
 
 
 
+
 % 7)
-% Número de blocos desejados
-numBlocosEnergia = 8;
+% Número de blocos da STFT
+numBlocosSTFT = 8;
 
-% Calcule o tamanho de cada bloco de energia (N/320)
-tamanhoBlocoEnergia = floor(length(frequenciasSTFT) / numBlocosEnergia);
+% Tamanho de cada bloco da STFT (N/320 amostras)
+tamanhoBlocoSTFT = floor(N / 320);
 
-% Inicialize matrizes para armazenar as energias dos blocos
-energiasSTFTsSim = zeros(numBlocosEnergia, 5, 10);
-energiasSTFTsNao = zeros(numBlocosEnergia, 5, 10);
+% Inicialização das matrizes para armazenar as energias dos blocos das STFTs
+energiasBlocosSim = zeros(tamanhoBlocoSTFT, numBlocosSTFT * 5);
+energiasBlocosNao = zeros(tamanhoBlocoSTFT, numBlocosSTFT * 5);
 
-% Divida e calcule as energias para os sinais "sim"
-for k = 1:10
-    for i = 1:5
-        STFTsim = STFTsSim(:, i);
-        for j = 1:numBlocosEnergia
-            inicio = (j - 1) * tamanhoBlocoEnergia + 1;
-            fim = j * tamanhoBlocoEnergia;
-            bloco = STFTsim(inicio:fim);
-            energiasSTFTsSim(j, i, k) = sum(bloco);
-        end
-    end
-end
-
-% Divida e calcule as energias para os sinais "não"
-for k = 1:10
-    for i = 1:5
-        STFTnao = STFTsNao(:, i);
-        for j = 1:numBlocosEnergia
-            inicio = (j - 1) * tamanhoBlocoEnergia + 1;
-            fim = j * tamanhoBlocoEnergia;
-            bloco = STFTnao(inicio:fim);
-            energiasSTFTsNao(j, i, k) = sum(bloco);
-        end
-    end
-end
-
-% Agora, as matrizes energiasSTFTsSim e energiasSTFTsNao contêm as energias dos blocos
-% para cada uma das 10 STFTs para sinais "sim" e "não"
-
-
-
-% 8)
-% Domínio do Tempo
-numBlocos = 80;
-tamanhoBloco = floor(length(S1) / numBlocos);
-energiasSimTempo = zeros(tamanhoBloco, numBlocos, 5);
-energiasNaoTempo = zeros(tamanhoBloco, numBlocos, 5);
-
-% Calcule e armazene as energias para cada bloco de cada sinal "sim" e "não" no domínio do tempo
+% Energias para os sinais "sim" em cada STFT
 for i = 1:5
-    sinalSim = eval(['S', num2str(i)]);
-    sinalNao = eval(['N', num2str(i)]);
-    
-    for j = 1:numBlocos
-        inicio = (j - 1) * tamanhoBloco + 1;
-        fim = j * tamanhoBloco;
-        
-        blocoSim = sinalSim(inicio:fim);
-        blocoNao = sinalNao(inicio:fim);
-        
-        energiasSimTempo(:, j, i) = sum(blocoSim.^2);
-        energiasNaoTempo(:, j, i) = sum(blocoNao.^2);
-    end
-end
-
-% Domínio da Frequência (Transformada de Fourier - TF)
-N = length(S1);
-frequencias = (0:pi/2/N:pi/2-pi/2/N);
-
-energiasSimTF = zeros(length(frequencias), 5);
-energiasNaoTF = zeros(length(frequencias), 5);
-
-% Calcule e armazene as energias para cada bloco de cada sinal "sim" e "não" no domínio da TF
-for i = 1:5
-    sinalSim = eval(['S', num2str(i)]);
-    sinalNao = eval(['N', num2str(i)]);
-    
-    TFsim = abs(fftshift(fft(sinalSim))).^2;
-    TFnao = abs(fftshift(fft(sinalNao))).^2;
-    
-    TFsim = TFsim(1:length(frequencias));
-    TFnao = TFnao(1:length(frequencias));
-    
-    for j = 1:numBlocos
-        inicio = (j - 1) * tamanhoBloco + 1;
-        fim = j * tamanhoBloco;
-        
-        blocoSim = TFsim(inicio:fim);
-        blocoNao = TFnao(inicio:fim);
-        
-        energiasSimTF(:, j, i) = sum(blocoSim);
-        energiasNaoTF(:, j, i) = sum(blocoNao);
-    end
-end
-
-% Domínio da Frequência (Transformada de Fourier de Tempo Curto - STFT)
-numBlocosSTFT = 10;
-tamanhoBlocoSTFT = floor(length(S1) / numBlocosSTFT);
-frequenciasSTFT = (0:pi/2/tamanhoBlocoSTFT:pi/2-pi/2/tamanhoBlocoSTFT);
-
-energiasSimSTFT = zeros(length(frequenciasSTFT), numBlocosSTFT, 5);
-energiasNaoSTFT = zeros(length(frequenciasSTFT), numBlocosSTFT, 5);
-
-% Calcule e armazene as energias para cada bloco de cada sinal "sim" e "não" no domínio da STFT
-for i = 1:5
-    sinalSim = eval(['S', num2str(i)]);
-    sinalNao = eval(['N', num2str(i)]);
-    
+    STFTsim = STFTsSim(:, i);
     for j = 1:numBlocosSTFT
         inicio = (j - 1) * tamanhoBlocoSTFT + 1;
         fim = j * tamanhoBlocoSTFT;
-        
-        blocoSim = sinalSim(inicio:fim);
-        blocoNao = sinalNao(inicio:fim);
-        
-        STFTsim = abs(fftshift(fft(blocoSim))).^2;
-        STFTnao = abs(fftshift(fft(blocoNao))).^2;
-        
-        STFTsim = STFTsim(1:length(frequenciasSTFT));
-        STFTnao = STFTnao(1:length(frequenciasSTFT));
-        
-        energiasSimSTFT(:, j, i) = sum(STFTsim);
-        energiasNaoSTFT(:, j, i) = sum(STFTnao);
+        blocoSTFT = STFTsim(inicio:fim);
+        energiasBlocosSim(:, (i - 1) * numBlocosSTFT + j) = sum(abs(blocoSTFT).^2);
     end
+end
+
+% Energias para os sinais "não" em cada STFT
+for i = 1:5
+    STFTnao = STFTsNao(:, i);
+    for j = 1:numBlocosSTFT
+        inicio = (j - 1) * tamanhoBlocoSTFT + 1;
+        fim = j * tamanhoBlocoSTFT;
+        blocoSTFT = STFTnao(inicio:fim);
+        energiasBlocosNao(:, (i - 1) * numBlocosSTFT + j) = sum(abs(blocoSTFT).^2);
+    end
+end
+
+% Agora têm-se as 80 energias para cada sinal de áudio (sim e não) em cada STFT.
+
+
+
+% 8) 
+% Energias calculadas no domínio do tempo para "sim" e "não" em vetores
+energiasTempoSim = energiasSim(:); % Transforma a matriz em um vetor coluna
+energiasTempoNao = energiasNao(:);
+
+% Vetores de tamanho 80x1 representando "sim" e "não" no domínio do tempo.
+
+% Organize as energias calculadas no domínio da TF para "sim" e "não" em vetores
+energiasTFSim = energiasBlocosSim(:); % Transforma a matriz em um vetor coluna
+energiasTFNao = energiasBlocosNao(:);
+
+
+% Energias calculadas no domínio da STFT para "sim" e "não" em vetores
+energiasSTFTSim = energiasBlocosSim(:); % Transforma a matriz em um vetor coluna
+energiasSTFTNao = energiasBlocosNao(:);
+
+
+
+% Média das energias para "sim" e "não" no domínio do tempo
+centroideTempoSim = mean(energiasTempoSim, 2); % Vetor coluna com tamanho 80x1
+centroideTempoNao = mean(energiasTempoNao, 2); % Vetor coluna com tamanho 80x1
+
+% Média das energias para "sim" e "não" no domínio da TF
+centroideTFSim = mean(energiasTFSim, 2); % Vetor coluna com tamanho 80x1
+centroideTFNao = mean(energiasTFNao, 2); % Vetor coluna com tamanho 80x1
+
+% Média das energias para "sim" e "não" no domínio da STFT
+centroideSTFTSim = mean(energiasSTFTSim, 2); % Vetor coluna com tamanho 80x1
+centroideSTFTNao = mean(energiasSTFTNao, 2); % Vetor coluna com tamanho 80x1
+
+
+% 9
+
+% 9.1) Sinais de áudio de teste
+load InputDataTest.mat
+
+% Separando os sinais em "Sim" e "Não"
+SimSignalsTest = InputDataTest(:, 4:7);
+NaoSignalsTest = InputDataTest(:, 1:3);
+
+% Definindo o tamanho desejado para os sinais
+tamanhoDesejado = 60000;
+
+% Preenchendo os sinais de teste com zeros para ter um tamanho de 60000
+SimSignalsTest = preencherComZeros09(SimSignalsTest, tamanhoDesejado);
+NaoSignalsTest = preencherComZeros09(NaoSignalsTest, tamanhoDesejado);
+
+
+% 9.2) Dividindo os sinais em 80 blocos de N/80 amostras e calcular a energia
+
+% Definindo o número de blocos desejados
+numBlocos = 80;
+
+% Inicializar matrizes para armazenar as energias
+energiasSimTest = zeros(numBlocos, 4);
+energiasNaoTest = zeros(numBlocos, 3);
+
+% Calcular o tamanho de cada bloco
+tamanhoBloco = floor(length(SimSignalsTest) / numBlocos);
+
+% Energias para os sinais "Sim" de teste
+for i = 1:4
+    sinalSimTest = SimSignalsTest(:, i);
+    for j = 1:numBlocos
+        inicio = (j - 1) * tamanhoBloco + 1;
+        fim = j * tamanhoBloco;
+        bloco = sinalSimTest(inicio:fim);
+        energiasSimTest(j, i) = sum(bloco.^2);
+    end
+end
+
+% Energias para os sinais "Não" de teste
+for i = 1:3
+    sinalNaoTest = NaoSignalsTest(:, i);
+    for j = 1:numBlocos
+        inicio = (j - 1) * tamanhoBloco + 1;
+        fim = j * tamanhoBloco;
+        bloco = sinalNaoTest(inicio:fim);
+        energiasNaoTest(j, i) = sum(bloco.^2);
+    end
+end
+
+% 9.3) Módulo ao quadrado da Transformada de Fourier (TF)
+
+% Número de pontos da TF
+N = length(SimSignalsTest);
+
+% Frequências correspondentes aos pontos da TF
+frequencias = (-pi:2*pi/N:pi-2*pi/N);
+
+% Inicializando matrizes para armazenar as TFs
+TFsSimTest = zeros(N, 4);
+TFsNaoTest = zeros(N, 3);
+
+% Módulo ao quadrado da TF para os sinais "Sim" de teste
+for i = 1:4
+    sinalSimTest = SimSignalsTest(:, i);
+    TF = abs(fftshift(fft(sinalSimTest))).^2;
+    TFsSimTest(:, i) = TF;
+end
+
+% Módulo ao quadrado da TF para os sinais "Não" de teste
+for i = 1:3
+    sinalNaoTest = NaoSignalsTest(:, i);
+    TF = abs(fftshift(fft(sinalNaoTest))).^2;
+    TFsNaoTest(:, i) = TF;
+end
+
+% 9.4) Eliminando as frequências negativas e acima de pi/2 das TFs e plotar
+
+% Apenas as frequências entre 0 e pi/2
+frequencias = frequencias(N/2+1:N);
+TFsSimTest = TFsSimTest(N/2+1:N, :);
+TFsNaoTest = TFsNaoTest(N/2+1:N, :);
+
+% 9.5) Dividindo as TFs em 80 blocos de N/320 amostras e calcular a energia
+
+% Número de blocos desejados
+numBlocosTF = 80;
+
+% Inicializando matrizes para armazenar as energias das TFs
+energiasTFBlocosSimTest = zeros(numBlocosTF, 4);
+energiasTFBlocosNaoTest = zeros(numBlocosTF, 3);
+
+% Tamanho de cada bloco da TF
+tamanhoBlocoTF = floor(length(frequencias) / numBlocosTF);
+
+% Energias para as TFs dos sinais "Sim" de teste
+for i = 1:4
+    TFsimTest = TFsSimTest(:, i);
+    for j = 1:numBlocosTF
+        inicio = (j - 1) * tamanhoBlocoTF + 1;
+        fim = j * tamanhoBlocoTF;
+        blocoTF = TFsimTest(inicio:fim);
+        energiasTFBlocosSimTest(j, i) = sum(blocoTF);
+    end
+end
+
+% Energias para as TFs dos sinais "Não" de teste
+for i = 1:3
+    TFnaoTest = TFsNaoTest(:, i);
+    for j = 1:numBlocosTF
+        inicio = (j - 1) * tamanhoBlocoTF + 1;
+        fim = j * tamanhoBlocoTF;
+        blocoTF = TFnaoTest(inicio:fim);
+        energiasTFBlocosNaoTest(j, i) = sum(blocoTF);
+    end
+end
+
+% 9.6) STFT e plotar (para um sinal de cada tipo)
+
+% Número de blocos desejados para a STFT
+numBlocosSTFT = 10;
+
+% Frequências correspondentes aos pontos da STFT (de 0 a pi/2)
+frequenciasSTFT = (0:pi/2/numBlocosSTFT:pi/2-pi/2/numBlocosSTFT);
+
+% Selecionando um sinal de áudio "Sim" e um sinal de áudio "Não" para cálculo da STFT
+sinalSimTest = SimSignalsTest(:, 1);
+sinalNaoTest = NaoSignalsTest(:, 1);
+
+% STFTs para o sinal "Sim" de teste
+STFTsSimTest = zeros(length(frequenciasSTFT), numBlocosSTFT);
+for j = 1:numBlocosSTFT
+    inicio = (j - 1) * tamanhoBlocoSTFT + 1;
+    fim = j * tamanhoBlocoSTFT;
+    blocoSTFT = sinalSimTest(inicio:fim);
+    STFT = abs(fftshift(fft(blocoSTFT))).^2;
+    STFTsSimTest(:, j) = STFT(1:length(frequenciasSTFT));
+end
+
+% STFTs para o sinal "Não" de teste
+STFTsNaoTest = zeros(length(frequenciasSTFT), numBlocosSTFT);
+for j = 1:numBlocosSTFT
+    inicio = (j - 1) * tamanhoBlocoSTFT + 1;
+    fim = j * tamanhoBlocoSTFT;
+    blocoSTFT = sinalNaoTest(inicio:fim);
+    STFT = abs(fftshift(fft(blocoSTFT))).^2;
+    STFTsNaoTest(:, j) = STFT(1:length(frequenciasSTFT));
+end
+
+% 9.7) STFTs em 8 blocos de N/320 amostras e calcular a energia
+
+% Número de blocos desejados para a energia da STFT
+numBlocosSTFTEnergia = 8;
+
+% Inicializando as matrizes para armazenar as energias das STFTs
+energiasSTFTBlocosSimTest = zeros(numBlocosSTFTEnergia, numBlocosSTFT);
+energiasSTFTBlocosNaoTest = zeros(numBlocosSTFTEnergia, numBlocosSTFT);
+
+% Tamanho de cada bloco da STFT para energia
+tamanhoBlocoSTFTEnergia = floor(numBlocosSTFT / numBlocosSTFTEnergia);
+
+% Energias para as STFTs do sinal "Sim" de teste
+for k = 1:numBlocosSTFTEnergia
+    inicio = (k - 1) * tamanhoBlocoSTFTEnergia + 1;
+    fim = k * tamanhoBlocoSTFTEnergia;
+    blocoSTFT = STFTsSimTest(:, inicio:fim);
+    energiaSTFT = sum(sum(blocoSTFT));
+    energiasSTFTBlocosSimTest(k, :) = energiaSTFT;
+end
+
+% Energias para as STFTs do sinal "Não" de teste
+for k = 1:numBlocosSTFTEnergia
+    inicio = (k - 1) * tamanhoBlocoSTFTEnergia + 1;
+    fim = k * tamanhoBlocoSTFTEnergia;
+    blocoSTFT = STFTsNaoTest(:, inicio:fim);
+    energiaSTFT = sum(sum(blocoSTFT));
+    energiasSTFTBlocosNaoTest(k, :) = energiaSTFT;
 end
 
 
@@ -468,11 +607,19 @@ end
 
 
 
+function vetorPreenchido = preencherComZeros09(vet, n)
+    quantidadeZeros = n - length(vet);
+    vetorZeros = zeros(quantidadeZeros, 1);
+    vetorPreenchido = [vet; zeros(quantidadeZeros, size(vet, 2))];
+end
 
 
 
 
 
 
-
-
+function vetorPreenchido = preencherComZeros(vet, n)
+    quantidadeZeros = n - length(vet);
+    vetorZeros = zeros(quantidadeZeros, 1);
+    vetorPreenchido = [vet; vetorZeros];
+end

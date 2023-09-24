@@ -2,184 +2,158 @@
 clear all;
 clc;
 
-% 1) Carregar os 10 sinais de áudio de InputDataTrain.m
+% 1) Carregando os sinais de áudio
 load InputDataTrain.mat
 
-% Separar os sinais em "Sim" e "Não"
-SinaisSim = InputDataTrain(:, 1:5);
-SinaisNao = InputDataTrain(:, 6:10);
+% Sinais Sim
+S = InputDataTrain(:, 1:5);
 
-% Plotar os sinais "Sim"
-figure;
+% Sinais Nao
+N = InputDataTrain(:, 6:10);
+
+% Tamanho desejado
+n = 60000;
+
+% Preencher com zeros ou truncar para o tamanho desejado
 for i = 1:5
-    subplot(2, 3, i);
-    plot(SinaisSim(:, i));
-    title(['Sim ', num2str(i)]);
+    sinal = S(:, i);
+    tamanhoAtual = length(sinal);
+    
+    if tamanhoAtual < n
+        zerosFaltantes = n - tamanhoAtual;
+        sinal = [sinal; zeros(zerosFaltantes, 1)];
+    elseif tamanhoAtual > n
+        sinal = sinal(1:n);
+    end
+    
+    S(:, i) = sinal;
 end
 
-% Plotar os sinais "Não"
-figure;
 for i = 1:5
-    subplot(2, 3, i);
-    plot(SinaisNao(:, i));
-    title(['Não ', num2str(i)]);
+    sinal = N(:, i);
+    tamanhoAtual = length(sinal);
+    
+    if tamanhoAtual < n
+        zerosFaltantes = n - tamanhoAtual;
+        sinal = [sinal; zeros(zerosFaltantes, 1)];
+    elseif tamanhoAtual > n
+        sinal = sinal(1:n);
+    end
+    
+    N(:, i) = sinal;
 end
 
-% 2) Dividir cada um dos 10 sinais em 80 blocos de N/80 amostras
+
+% Plotar os sinais
+
+% Criar uma figura para os sinais "Sim"
+figure;
+labelsSim = {'Sim 1', 'Sim 2', 'Sim 3', 'Sim 4', 'Sim 5'};
+
+% Loop para plotar cada sinal "sim"
+for i = 1:5
+    subplot(2, 3, i);
+    plot(S(:, i));
+    title(labelsSim{i});
+end
+
+% Ajustar o espaçamento 
+spacing = 0.02;
+margin = 0.05;
+padding = 0.02;
+subplotsSim = get(gcf, 'Children');
+for i = 1:length(subplotsSim)
+    subplotsSim(i).Position(1) = subplotsSim(i).Position(1) + padding;
+    subplotsSim(i).Position(3) = subplotsSim(i).Position(3) - 2 * padding;
+    subplotsSim(i).Position(2) = subplotsSim(i).Position(2) + margin;
+    subplotsSim(i).Position(4) = subplotsSim(i).Position(4) - margin;
+end
+
+% Criar uma figura para os sinais "Não"
+figure;
+labelsNao = {'Não 1', 'Não 2', 'Não 3', 'Não 4', 'Não 5'};
+
+% Loop para plotar cada sinal "não"
+for i = 1:5
+    subplot(2, 3, i);
+    plot(N(:, i));
+    title(labelsNao{i});
+end
+
+% Ajustar o espaçamento
+spacing = 0.02;
+margin = 0.05;
+padding = 0.02;
+subplotsNao = get(gcf, 'Children');
+for i = 1:length(subplotsNao)
+    subplotsNao(i).Position(1) = subplotsNao(i).Position(1) + padding;
+    subplotsNao(i).Position(3) = subplotsNao(i).Position(3) - 2 * padding;
+    subplotsNao(i).Position(2) = subplotsNao(i).Position(2) + margin;
+    subplotsNao(i).Position(4) = subplotsNao(i).Position(4) - margin;
+end
+
+% 2) Energia dos sinais
+
+% Número de blocos desejados
 numBlocos = 80;
-tamanhoSinal = size(SinaisSim, 1); % Tamanho de cada sinal
-tamanhoBloco = floor(tamanhoSinal / numBlocos);
 
-energiasSim = zeros(tamanhoBloco, numBlocos, 5);
-energiasNao = zeros(tamanhoBloco, numBlocos, 5);
+% Calcule o tamanho de cada bloco
+tamanhoBloco = floor(size(S, 1) / numBlocos);
 
+% Inicialize matrizes para armazenar as energias dos blocos
+energiasSim = zeros(numBlocos, 5);
+energiasNao = zeros(numBlocos, 5);
+
+% Calcule as energias para os sinais "sim"
 for i = 1:5
-    sinalSim = SinaisSim(:, i);
     for j = 1:numBlocos
         inicio = (j - 1) * tamanhoBloco + 1;
         fim = j * tamanhoBloco;
-        bloco = sinalSim(inicio:fim);
-        energiasSim(:, j, i) = sum(bloco.^2);
+        bloco = S(inicio:fim, i);
+        energiasSim(j, i) = sum(bloco.^2);
     end
 end
 
+% Calcule as energias para os sinais "não"
 for i = 1:5
-    sinalNao = SinaisNao(:, i);
     for j = 1:numBlocos
         inicio = (j - 1) * tamanhoBloco + 1;
         fim = j * tamanhoBloco;
-        bloco = sinalNao(inicio:fim);
-        energiasNao(:, j, i) = sum(bloco.^2);
+        bloco = N(inicio:fim, i);
+        energiasNao(j, i) = sum(bloco.^2);
     end
 end
 
-% Plotar as energias dos blocos para "Sim"
+% Plotar as energias dos blocos
+
+% Criar uma figura para as energias dos sinais "sim"
 figure;
+
+% Loop para plotar as energias dos sinais "sim"
 for i = 1:5
-    subplot(2, 3, i);
-    plot(1:numBlocos, energiasSim(:, :, i));
+    subplot(5, 1, i);
+    plot(1:numBlocos, energiasSim(:, i));
     title(['Energias Sim ', num2str(i)]);
     xlabel('Índice do Bloco');
     ylabel('Energia');
 end
 
-% Plotar as energias dos blocos para "Não"
+% Criar uma figura para as energias dos sinais "não"
 figure;
+
+% Loop para plotar as energias dos sinais "não"
 for i = 1:5
-    subplot(2, 3, i);
-    plot(1:numBlocos, energiasNao(:, :, i));
+    subplot(5, 1, i);
+    plot(1:numBlocos, energiasNao(:, i));
     title(['Energias Não ', num2str(i)]);
     xlabel('Índice do Bloco');
     ylabel('Energia');
 end
 
-% 3) Calcular o módulo ao quadrado da Transformada de Fourier (TF)
-N = tamanhoSinal;
-frequencias = (-pi:2*pi/N:pi-2*pi/N);
 
-TFsSim = zeros(N, 5);
-TFsNao = zeros(N, 5);
-
-for i = 1:5
-    sinalSim = SinaisSim(:, i);
-    TF = abs(fftshift(fft(sinalSim))).^2;
-    TFsSim(:, i) = TF;
+function vetorPreenchido = preencherComZeros(vet, n)
+    quantidadeZeros = n - length(vet);
+    vetorZeros = zeros(quantidadeZeros, 1);
+    vetorPreenchido = [vet; vetorZeros];
 end
 
-for i = 1:5
-    sinalNao = SinaisNao(:, i);
-    TF = abs(fftshift(fft(sinalNao))).^2;
-    TFsNao(:, i) = TF;
-end
-
-% 4) Eliminar frequências negativas e acima de pi/2 das TFs
-frequencias = frequencias(N/2+1:N);
-TFsSim = TFsSim(N/2+1:N, :);
-TFsNao = TFsNao(N/2+1:N, :);
-
-% 5) Dividir cada uma das 10 TFs do Item 4 em 80 blocos de N/320 amostras
-numBlocosTF = 80;
-tamanhoBlocoTF = floor(length(frequencias) / numBlocosTF);
-
-energiasTFBlocosSim = zeros(tamanhoBlocoTF, numBlocosTF, 5);
-energiasTFBlocosNao = zeros(tamanhoBlocoTF, numBlocosTF, 5);
-
-for i = 1:5
-    TFsim = TFsSim(:, i);
-    for j = 1:numBlocosTF
-        inicio = (j - 1) * tamanhoBlocoTF + 1;
-        fim = j * tamanhoBlocoTF;
-        blocoTF = TFsim(inicio:fim);
-        energiasTFBlocosSim(:, j, i) = sum(blocoTF);
-    end
-end
-
-for i = 1:5
-    TFnao = TFsNao(:, i);
-    for j = 1:numBlocosTF
-        inicio = (j - 1) * tamanhoBlocoTF + 1;
-        fim = j * tamanhoBlocoTF;
-        blocoTF = TFnao(inicio:fim);
-        energiasTFBlocosNao(:, j, i) = sum(blocoTF);
-    end
-end
-
-% 6) Dividir cada um dos sinais de áudio (no domínio do tempo) em 10 blocos de N/10 amostras
-numBlocosSTFT = 10;
-tamanhoBlocoSTFT = floor(tamanhoSinal / numBlocosSTFT);
-
-STFTSim = zeros(N/2, numBlocosSTFT, 1);
-STFTNao = zeros(N/2, numBlocosSTFT, 1);
-
-for i = 1
-    sinalSim = SinaisSim(:, i);
-    for j = 1:numBlocosSTFT
-        inicio = (j - 1) * tamanhoBlocoSTFT + 1;
-        fim = j * tamanhoBlocoSTFT;
-        blocoSTFT = sinalSim(inicio:fim);
-        TF = abs(fftshift(fft(blocoSTFT))).^2;
-        frequenciasSTFT = frequencias(N/2+1:N);
-        TF = TF(N/2+1:N);
-        STFTSim(:, j, i) = TF;
-    end
-end
-
-for i = 6
-    sinalNao = SinaisNao(:, i-5);
-    for j = 1:numBlocosSTFT
-        inicio = (j - 1) * tamanhoBlocoSTFT + 1;
-        fim = j * tamanhoBlocoSTFT;
-        blocoSTFT = sinalNao(inicio:fim);
-        TF = abs(fftshift(fft(blocoSTFT))).^2;
-        frequenciasSTFT = frequencias(N/2+1:N);
-        TF = TF(N/2+1:N);
-        STFTNao(:, j, i-5) = TF;
-    end
-end
-
-% 7) Dividir as STFTs em 8 blocos de N/320 amostras
-numBlocosSTFT = 8;
-tamanhoBlocoSTFT = floor(N/2 / numBlocosSTFT);
-
-energiasSTFTBlocosSim = zeros(tamanhoBlocoSTFT, numBlocosSTFT, 5);
-energiasSTFTBlocosNao = zeros(tamanhoBlocoSTFT, numBlocosSTFT, 5);
-
-for i = 1:5
-    STFTsim = STFTSim(:, :, i);
-    for j = 1:numBlocosSTFT
-        inicio = (j - 1) * tamanhoBlocoSTFT + 1;
-        fim = j * tamanhoBlocoSTFT;
-        blocoSTFT = STFTsim(inicio:fim, :);
-        energiasSTFTBlocosSim(:, j, i) = sum(blocoSTFT(:).^2);
-    end
-end
-
-for i = 1:5
-    STFTnao = STFTNao(:, :, i);
-    for j = 1:numBlocosSTFT
-        inicio = (j - 1) * tamanhoBlocoSTFT + 1;
-        fim = j * tamanhoBlocoSTFT;
-        blocoSTFT = STFTnao(inicio:fim, :);
-        energiasSTFTBlocosNao(:, j, i) = sum(blocoSTFT(:).^2);
-    end
-end

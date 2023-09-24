@@ -9,8 +9,8 @@ NaoSignalsTest = InputDataTest(:, 1:3);
 tamanhoDesejado = 60000;
 
 % Preencher os sinais de teste com zeros para ter um tamanho de 60000
-SimSignalsTest = preencherComZeros(SimSignalsTest, tamanhoDesejado);
-NaoSignalsTest = preencherComZeros(NaoSignalsTest, tamanhoDesejado);
+SimSignalsTest = preencherComZeros09(SimSignalsTest, tamanhoDesejado);
+NaoSignalsTest = preencherComZeros09(NaoSignalsTest, tamanhoDesejado);
 
 
 % 2) Dividir os sinais em 80 blocos de N/80 amostras e calcular a energia
@@ -178,7 +178,7 @@ end
 
 % Agora você tem as energias calculadas para os sinais de teste nos 3 domínios.
 
-function vetorPreenchido = preencherComZeros(vet, n)
+function vetorPreenchido = preencherComZeros09(vet, n)
     quantidadeZeros = n - length(vet);
     vetorZeros = zeros(quantidadeZeros, 1);
     vetorPreenchido = [vet; zeros(quantidadeZeros, size(vet, 2))];
